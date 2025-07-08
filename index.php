@@ -1,34 +1,42 @@
-<?php
-require_once 'Config/Config.php';
-$ruta = !empty($_GET['url']) ? $_GET['url'] : "principal/index";
-$array = explode("/", $ruta);
-$controller = ucfirst($array[0]);
-$metodo = "index";
-$parametro = "";
-if (!empty($array[1])) {
-    if ($array[1] != "") {
-        $metodo = $array[1];
+<?php include 'includes/session.php'; ?>
+<?php include 'includes/header.php'; ?>
+<?php include 'includes/navbar.php'; ?>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel Principal</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <style>
+    body {
+      padding-top: 50px;
+      background-color: #ecf0f1;
     }
-}
-if (!empty($array[2])) {
-    if ($array[2] != "") {
-        for ($i = 2; $i < count($array); $i++) {
-            $parametro .= $array[$i] . ",";
-        }
-        $parametro = trim($parametro, ",");
+    .content-wrapper {
+      margin-left: 230px;
+      padding: 20px;
     }
-}
-require_once 'Config/App/Autoload.php';
-$dirControllers = "Controllers/" . $controller . ".php";
-if (file_exists($dirControllers)) {
-    require_once $dirControllers;
-    $controller = new $controller();
-    if (method_exists($controller, $metodo)) {
-        $controller->$metodo($parametro);
-    } else {
-        echo 'No existe el metodo';
-    }
-} else {
-    echo 'No existe el controlador';
-}
-?>
+  </style>
+</head>
+<body>
+  <?php include 'includes/sidebar.php'; ?>
+
+  <div class="content-wrapper">
+    <h2>Bienvenido al Gestor Escolar</h2>
+    <p>Seleccioná una opción del menú para comenzar.</p>
+
+    <?php
+		if (isset($_SESSION['user_data']) && is_array($_SESSION['user_data'])) {
+		$user = $_SESSION['user_data'];
+		echo "<div class='alert alert-info'>Hola, <strong>{$user['first_name']} {$user['last_name']}</strong>. Estás logueado como <strong>" . ($user['type'] == 1 ? "Administrador" : "Usuario") . "</strong>.</div>";
+		} else {
+		echo "<div class='alert alert-warning'>No se pudo cargar la información del usuario.</div>";
+		}
+	?>
+
+  </div>
+
+  <?php include 'includes/footer.php'; ?>
+</body>
+</html>
