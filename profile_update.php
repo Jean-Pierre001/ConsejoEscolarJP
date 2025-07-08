@@ -27,10 +27,11 @@ if (isset($_POST['save'])) {
     }
 
     if (!empty($password)) {
-        $new_password = password_hash($password, PASSWORD_DEFAULT);
+    $new_password = password_hash($password, PASSWORD_DEFAULT);
     } else {
         $new_password = $admin['password'];
     }
+
 
     // Procesar foto
     if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
