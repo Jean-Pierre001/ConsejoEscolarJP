@@ -6,21 +6,20 @@ if (isset($_POST['login'])) {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    $conn = $pdo->open();
-
     try {
-        $stmt = $conn->prepare("SELECT * FROM users WHERE email = :email LIMIT 1");
+        // Usamos $pdo directamente para preparar y ejecutar la consulta
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email LIMIT 1");
         $stmt->execute(['email' => $email]);
         $user = $stmt->fetch();
 
         if ($user) {
-            // Verificar contraseña (ajusta según cómo la guardás)
+            // Verificar contraseña
             if (password_verify($password, $user['password'])) {
-                // Guardar todos los datos en sesión
-                $_SESSION['user'] = $user;            // Para tipo de usuario y lógica general
-                $_SESSION['user_data'] = $user;       // Para mostrar en navbar
+                // Guardar datos del usuario en sesión
+                $_SESSION['user'] = $user;        // Datos generales para lógica
+                $_SESSION['user_data'] = $user;   // Datos para mostrar en navbar
 
-                // Redirigir según tipo de usuario
+                // Redirigir según tipo de usuario (ajustá según tus tipos)
                 switch ($user['type']) {
                     case 1:
                         header('Location: index.php');
@@ -46,9 +45,9 @@ if (isset($_POST['login'])) {
         exit();
     }
 
-    $pdo->close();
 } else {
-    // Acceso directo sin envío del formulario
+    // Acceso directo sin pasar por formulario login
     header('Location: login.php');
     exit();
 }
+?>

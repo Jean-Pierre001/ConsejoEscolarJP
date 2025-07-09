@@ -1,30 +1,9 @@
 <?php
-
-class Database {
-
-    private $server = "mysql:host=localhost;dbname=consejo;charset=utf8mb4";
-    private $username = "root";
-    private $password = "";
-    private $options  = array(
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    );
-    protected $conn;
-
-    public function open() {
-        try {
-            $this->conn = new PDO($this->server, $this->username, $this->password, $this->options);
-            return $this->conn;
-        } catch (PDOException $e) {
-            echo "There is some problem in connection: " . $e->getMessage();
-        }
-    }
-
-    public function close() {
-        $this->conn = null;
-    }
+try {
+    $pdo = new PDO("mysql:host=localhost;dbname=consejo;charset=utf8mb4", "root", "");
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    die("Error en la conexión a la base de datos: " . $e->getMessage());
 }
-
-$pdo = new Database();
-
 ?>

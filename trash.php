@@ -1,22 +1,14 @@
-<?php
-include 'includes/session.php'; 
-include 'includes/header.php'; 
-include 'includes/navbar.php'; 
-include_once 'includes/conn.php';
-
-
-$database = new Database();
-$pdo = $database->open();
-?>
+<?php include 'includes/session.php'; ?>
+<?php include 'includes/header.php'; ?>
+<?php include 'includes/navbar.php'; ?>
 
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Papelera de Carpetas</title>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" />
   <style>
-    /* Puedes copiar los estilos de folders.php para mantener estética */
     body {
       padding-top: 50px;
       background-color: #e8f0fe;
@@ -76,62 +68,52 @@ $pdo = $database->open();
   <h2>Papelera de Carpetas</h2>
   <p>Carpetas dentro del directorio <code>/trash</code>:</p>
 
-  <?php
-    if (isset($_SESSION['success'])) {
-        echo '<div class="alert alert-success">'. $_SESSION['success'] .'</div>';
-        unset($_SESSION['success']);
-    }
-    if (isset($_SESSION['error'])) {
-        echo '<div class="alert alert-danger">'. $_SESSION['error'] .'</div>';
-        unset($_SESSION['error']);
-    }
-  ?>
-
   <div class="folder-grid">
     <?php
-      try {
-          $stmt = $pdo->prepare("SELECT * FROM trash");
-          $stmt->execute();
-          $folders = $stmt->fetchAll();
+    require_once 'includes/conn.php';
 
-          if (count($folders) === 0) {
-              echo "<p>No hay carpetas en la papelera.</p>";
-          }
+    // Obtener todas las carpetas en tabla trash
+    $stmt = $pdo->prepare("SELECT * FROM trash ORDER BY deleted_on DESC");
+    $stmt->execute();
+    $folders = $stmt->fetchAll();
 
-          foreach ($folders as $folder) {
-              $folder_name = htmlspecialchars($folder['name']);
-              $folder_path = 'trash/' . $folder_name;
-              $encoded_name = urlencode($folder_name);
+    if (!$folders) {
+      echo "<p>No hay carpetas en la papelera.</p>";
+    } else {
+      foreach ($folders as $folder) {
+        $folder_name = htmlspecialchars($folder['name']);
+        $encoded_name = urlencode($folder_name);
+        $folder_path = 'trash/' . $folder['name'];
 
-              // Solo mostrar si la carpeta física existe
-              if (is_dir($folder_path)) {
-                echo '
-                  <div style="position: relative; display: inline-block; margin: 10px;">
-                    <a href="detailsfolders.php?folder=' . $encoded_name . '" class="folder-card" style="display: block;">
-                      <div class="folder-icon">
-                        <span class="glyphicon glyphicon-folder-close"></span>
-                      </div>
-                      <div class="folder-name">' . $folder_name . '</div>
-                    </a>
+        if (!is_dir($folder_path)) {
+          // Si la carpeta física no existe, mostrar mensaje o ignorar
+          continue;
+        }
 
-                    <form method="POST" action="restore_folder.php" onsubmit="return confirm(\'¿Restaurar carpeta ' . $folder_name . '?\');" style="position: absolute; top: 5px; right: 10px;">
-                      <input type="hidden" name="folder_id" value="' . $folder['id'] . '">
-                      <button type="submit" style="background:none; border:none; color:green; font-size: 18px; cursor:pointer;" title="Restaurar carpeta">&#8634;</button>
-                    </form>
-                  </div>
-                ';
-              }
-          }
-      } catch (PDOException $e) {
-          echo "<div class='alert alert-danger'>Error al cargar la papelera: " . $e->getMessage() . "</div>";
+        echo '
+          <div style="position: relative; display: inline-block; margin: 10px;">
+            <a href="folders_back/detailsfolders.php?folder=' . $encoded_name . '" class="folder-card" style="display: block;">
+              <div class="folder-icon">
+                <span class="glyphicon glyphicon-folder-open"></span>
+              </div>
+              <div class="folder-name">' . $folder_name . '</div>
+            </a>
+            <form method="POST" action="restore_folder.php" onsubmit="return confirm(\'¿Restaurar carpeta ' . $folder_name . '?\');" style="position: absolute; top: 5px; right: 10px;">
+              <input type="hidden" name="folder_id" value="' . intval($folder['id']) . '">
+              <button type="submit" style="background: none; border: none; color: green; font-size: 20px; cursor: pointer;" title="Restaurar carpeta">
+                &#8634;
+              </button>
+            </form>
+          </div>
+        ';
       }
-
-      $database->close();
+    }
     ?>
   </div>
 </div>
 
 <?php include 'includes/footer.php'; ?>
+<?php include 'includes/scripts.php' ?>
 
 </body>
 </html>

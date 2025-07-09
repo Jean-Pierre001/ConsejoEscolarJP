@@ -4,10 +4,10 @@
     // Redireccionar según tipo de usuario
     switch ($_SESSION['user']['type']) {
       case 1:
-        header('location: admin/index.php');
+        header('location: index.php');
         break;
       default:
-        header('location: user/index.php');
+        header('location: index.php');
     }
   }
 ?>
