@@ -102,7 +102,7 @@
               <div class="folder-name">' . htmlspecialchars($folder_name) . '</div>
             </a>
             <form method="POST" action="delete_folder.php" onsubmit="return confirm(\'¿Eliminar carpeta ' . addslashes(htmlspecialchars($folder_name)) . '?\');" class="delete-button">
-              <input type="hidden" name="folder_id" value="' . $folder_id . '">
+              <input type="hidden" name="folder_id" value="<?= $folder_id ?>">
               <button type="submit" class="btn btn-danger btn-sm">
                 <span class="glyphicon glyphicon-trash"></span>
               </button>

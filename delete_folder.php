@@ -40,7 +40,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $trashFolderSystemName   // Nombre físico sigue igual
             ]);
 
-
             // Eliminar de folders
             $delete = $pdo->prepare("DELETE FROM folders WHERE id = ?");
             $delete->execute([$folder_id]);
@@ -51,12 +50,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $oldPath = $baseFolders . $folder['folder_system_name'];
             $newPath = $baseTrash . $folder['folder_system_name'];
-
-            if (!is_dir($oldPath)) {
-                $_SESSION['error'] = "La carpeta física NO existe en la ruta esperada: $oldPath";
-                header('Location: folders.php');
-                exit;
-            }
 
             if (!is_dir($baseTrash)) {
                 mkdir($baseTrash, 0755, true);

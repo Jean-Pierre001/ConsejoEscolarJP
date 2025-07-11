@@ -1,8 +1,6 @@
-<?php include 'includes/session.php'; ?>
-<?php include 'includes/header.php'; ?>
-<?php include 'includes/navbar.php'; ?>
-
 <?php
+// Inicio: Lógica de descarga ANTES de cualquier salida o include
+
 $base_dir = realpath('folders');
 $folder = isset($_GET['folder']) ? $_GET['folder'] : '';
 $folder = trim($folder, '/\\');
@@ -13,7 +11,6 @@ if (!$target_path || strpos($target_path, $base_dir) !== 0) {
     die("Acceso no permitido.");
 }
 
-// --- DESCARGA DE ARCHIVO ---
 if (isset($_GET['download'])) {
     $file_to_download = basename($_GET['download']);
     $file_path = $target_path . DIRECTORY_SEPARATOR . $file_to_download;
@@ -34,6 +31,13 @@ if (isset($_GET['download'])) {
         die('Archivo no encontrado.');
     }
 }
+
+// --- Fin lógica descarga ---
+
+// Ahora sí incluir archivos que pueden generar salida:
+include 'includes/session.php';
+include 'includes/header.php';
+include 'includes/navbar.php';
 
 // --- ELIMINAR ARCHIVOS Y CARPETAS ---
 $msg = '';
@@ -123,7 +127,7 @@ if (isset($_POST['upload']) && isset($_FILES['file'])) {
       border-radius: 15px;
       box-shadow: 0 8px 16px rgba(0,0,0,0.08);
       text-align: center;
-      padding: 20px 10px 50px 10px; /* más espacio abajo para botones */
+      padding: 20px 10px 50px 10px; /* espacio abajo para botones */
       overflow: hidden;
       position: relative;
       word-break: break-word;
@@ -146,7 +150,6 @@ if (isset($_POST['upload']) && isset($_FILES['file'])) {
       font-size: 15px;
       font-weight: 500;
       color: #2c3e50;
-      /* separar el texto del boton */
       margin-bottom: 10px;
       overflow-wrap: break-word;
     }
@@ -252,7 +255,7 @@ if (isset($_POST['upload']) && isset($_FILES['file'])) {
         $link = 'detailsfolders.php?folder=' . urlencode(($folder ? $folder . '/' : '') . $item);
         $name_link = '<a href="' . $link . '">' . htmlspecialchars($item) . '</a>';
       } else {
-        // Link para descarga (mismo archivo, parámetro download)
+        // Link para descarga
         $link = 'detailsfolders.php?folder=' . urlencode($folder) . '&download=' . urlencode($item);
         $name_link = '<a href="' . $link . '">' . htmlspecialchars($item) . '</a>';
       }

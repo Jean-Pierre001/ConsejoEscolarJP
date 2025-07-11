@@ -65,11 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
                 moveFolder($old_path, $new_path);
-            } else {
-                $_SESSION['error'] = "La carpeta física no existe en la papelera.";
-                header('Location: trash.php');
-                exit;
-            }
+            } 
 
             $_SESSION['success'] = "Carpeta restaurada correctamente.";
             header('Location: trash.php');

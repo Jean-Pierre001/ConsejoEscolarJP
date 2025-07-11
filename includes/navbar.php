@@ -4,7 +4,7 @@ if (isset($_SESSION['user_data'])) {
   $admin = $_SESSION['user_data']; // o $user
 }
 
-include 'profile_modal.php';
+include 'modals/profile_modal.php';
 
 ?>
 

@@ -29,12 +29,13 @@ if (isset($_POST['save'])) {
             exit();
         }
 
-        // Hashear nueva contraseña si se ingresó, si no usar la anterior
-        if (!empty($password)) {
+        // Hashear nueva contraseña solo si se ingresó una no vacía y no solo espacios
+        if (!empty(trim($password))) {
             $new_password = password_hash($password, PASSWORD_DEFAULT);
         } else {
             $new_password = $admin['password'];
         }
+
 
         // Procesar foto si hay subida
         if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
