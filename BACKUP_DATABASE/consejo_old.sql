@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 11-07-2025 a las 12:49:52
+-- Tiempo de generación: 11-07-2025 a las 02:34:30
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.0.30
 
@@ -33,7 +33,6 @@ CREATE TABLE `folders` (
   `cue` varchar(20) NOT NULL,
   `folder_path` varchar(255) NOT NULL,
   `location` varchar(100) NOT NULL,
-  `folder_system_name` varchar(100) NOT NULL,
   `created_on` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
@@ -41,8 +40,8 @@ CREATE TABLE `folders` (
 -- Volcado de datos para la tabla `folders`
 --
 
-INSERT INTO `folders` (`id`, `name`, `cue`, `folder_path`, `location`, `folder_system_name`, `created_on`) VALUES
-(5, 'Carpeta3', 'CUE003', 'folders/Carpeta3', 'Ubicación 3', '', '2025-07-09');
+INSERT INTO `folders` (`id`, `name`, `cue`, `folder_path`, `location`, `created_on`) VALUES
+(5, 'Carpeta3', 'CUE003', 'folders/Carpeta3', 'Ubicación 3', '2025-07-09');
 
 -- --------------------------------------------------------
 
@@ -134,7 +133,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `email`, `password`, `type`, `first_name`, `last_name`, `address`, `contact_info`, `photo`, `created_on`) VALUES
-(3, 'admin@admin', '$2y$10$MKlqvQph3lwyz38tNPYlteTTVjVlhbWxYM2IPVGQMaN4Bb/UNt/cK', 1, 'Admin', 'User', 'Admin Address', '1234567890', '', '2025-07-11');
+(2, 'admin@admin', '$2y$10$DU.yqXQ9yEUDnE1WbUvgGekIgGANVEdkPenA2rGh5EfDrNt2PI/uK', 1, 'Jean Pierre', 'Lobos', '', '', '686d427a0b5e9.jpg', '2025-07-08');
 
 --
 -- Índices para tablas volcadas
@@ -202,7 +201,7 @@ ALTER TABLE `trash`
 -- AUTO_INCREMENT de la tabla `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
