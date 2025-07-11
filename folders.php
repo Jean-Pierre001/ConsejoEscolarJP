@@ -58,6 +58,12 @@
       color: #2c3e50;
       word-break: break-word;
     }
+
+    .delete-button {
+      position: absolute;
+      top: 5px;
+      right: 10px;
+    }
   </style>
 </head>
 <body>
@@ -66,47 +72,49 @@
 
 <div class="content-wrapper">
   <h2>Gestor de Carpetas</h2>
-  <p>Carpetas dentro del directorio <code>/folders</code>:</p>
+  <p>Carpetas registradas en el sistema:</p>
 
   <div class="folder-grid">
     <?php
-      $folder_path = 'folders/';
-      if (is_dir($folder_path)) {
-        $folders = array_filter(glob($folder_path . '*'), 'is_dir');
+      require_once 'includes/conn.php';
 
-        if (count($folders) === 0) {
-          echo "<p>No hay carpetas dentro de <code>/folders</code>.</p>";
-        }
+      // Consultar todas las carpetas desde la base de datos
+      $sql = "SELECT * FROM folders";
+      $stmt = $pdo->query($sql);
+      $folders = $stmt->fetchAll();
 
-        foreach ($folders as $folder) {
-            $folder_name = basename($folder);
-            $encoded_name = urlencode($folder_name);
+      if (count($folders) === 0) {
+        echo "<p>No hay carpetas registradas.</p>";
+      }
 
-            echo '
-                <div style="position: relative; display: inline-block; margin: 10px;">
-                <a href="detailsfolders.php?folder=' . $encoded_name . '" class="folder-card" style="display: block;">
-                    <div class="folder-icon">
-                    <span class="glyphicon glyphicon-folder-open"></span>
-                    </div>
-                    <div class="folder-name">' . htmlspecialchars($folder_name) . '</div>
-                </a>
-                <form method="POST" action="delete_folder.php" onsubmit="return confirm(\'¿Eliminar carpeta ' . htmlspecialchars($folder_name) . '?\');" style="position: absolute; top: 5px; right: 10px;">
-                    <input type="hidden" name="folder_name" value="' . htmlspecialchars($folder_name) . '">
-                    <button type="submit" style="background: none; border: none; color: red; font-size: 20px; cursor: pointer;" title="Eliminar carpeta">&times;</button>
-                </form>
-                </div>
-            ';
-            }
+      foreach ($folders as $folder) {
+        $folder_name = $folder['name']; // nombre visible
+        $folder_system_name = $folder['folder_system_name']; // nombre físico
+        $encoded_name = urlencode($folder_system_name);
+        $folder_id = $folder['id'];
 
-      } else {
-        echo "<div class='alert alert-danger'>La carpeta <code>folders/</code> no existe.</div>";
+        echo '
+          <div style="position: relative; display: inline-block; margin: 10px;">
+            <a href="detailsfolders.php?folder=' . $encoded_name . '" class="folder-card" style="display: block;">
+              <div class="folder-icon">
+                <span class="glyphicon glyphicon-folder-open"></span>
+              </div>
+              <div class="folder-name">' . htmlspecialchars($folder_name) . '</div>
+            </a>
+            <form method="POST" action="delete_folder.php" onsubmit="return confirm(\'¿Eliminar carpeta ' . addslashes(htmlspecialchars($folder_name)) . '?\');" class="delete-button">
+              <input type="hidden" name="folder_id" value="' . $folder_id . '">
+              <button type="submit" class="btn btn-danger btn-sm">
+                <span class="glyphicon glyphicon-trash"></span>
+              </button>
+            </form>
+          </div>
+        ';
       }
     ?>
   </div>
 </div>
 
 <?php include 'includes/footer.php'; ?>
-
 <?php include 'includes/scripts.php'; ?>
 
 </body>

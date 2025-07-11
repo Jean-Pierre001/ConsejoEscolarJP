@@ -52,7 +52,7 @@ $schools = $stmt->fetchAll();
 <body>
 
 <?php include 'includes/modals/modalschools.php'; ?>
-<?php include 'includes/sidebar.php'; ?>
+
 
 <?php if (isset($_SESSION['error'])): ?>
   <div class="alert alert-danger"><?= $_SESSION['error'] ?></div>
@@ -149,7 +149,7 @@ $schools = $stmt->fetchAll();
                     <i class="bi bi-trash-fill"></i>
                   </button>
                 </form>
-                <a href="../crearCarpeta.php?CUE=<?= urlencode($school['cue']) ?>&nombreEscuela=<?= urlencode($school['school_name']) ?>&localidad=<?= urlencode($school['locality']) ?>" class="btn btn-default btn-xs" title="Crear carpeta">
+                <a href="schools_back/createFolder.php?CUE=<?= urlencode($school['cue']) ?>&nombreEscuela=<?= urlencode($school['school_name']) ?>&localidad=<?= urlencode($school['locality']) ?>" class="btn btn-default btn-xs" title="Crear carpeta">
                   <i class="bi bi-folder-plus"></i>
                 </a>
               </td>

@@ -12,9 +12,13 @@ if (!$cue) {
     exit;
 }
 
-// Función para sanear nombre de carpeta
 function sanitizeFolderName($name) {
-    return preg_replace('/[^a-zA-Z0-9_-]/', '_', $name);
+    $name = strtolower($name);
+    $name = iconv('UTF-8', 'ASCII//TRANSLIT', $name);
+    $name = preg_replace('/[\s-]+/', '_', $name);
+    $name = preg_replace('/[^a-z0-9_]/', '', $name);
+    $name = trim($name, '_');
+    return $name;
 }
 
 // Verificar si ya existe carpeta para ese CUE
@@ -30,30 +34,36 @@ if ($folderExists) {
 }
 
 // Crear carpeta física
-$basePath = __DIR__ . '/../folders/escuelas/';
-$folderName = sanitizeFolderName($cue);
-$fullPath = $basePath . $folderName;
+$basePath = __DIR__ . '/../folders/';
+$folderSystemName = sanitizeFolderName($name);
 
-if (!is_dir($fullPath)) {
-    if (!mkdir($fullPath, 0755, true)) {
-        $_SESSION['error'] = "Error al crear la carpeta física.";
-        header("Location: ../schools.php");
-        exit;
-    }
-} else {
-    $_SESSION['error'] = "La carpeta física ya existe.";
+// Evitar duplicados si ya existe físicamente
+$originalName = $folderSystemName;
+$counter = 1;
+while (is_dir($basePath . $folderSystemName)) {
+    $folderSystemName = $originalName . '_' . $counter;
+    $counter++;
+}
+
+$fullPath = $basePath . $folderSystemName;            // Ruta absoluta
+$relativePath = "folders/" . $folderSystemName;       // Ruta para guardar en la BD
+
+if (!mkdir($fullPath, 0755, true)) {
+    $_SESSION['error'] = "Error al crear la carpeta física.";
     header("Location: ../schools.php");
     exit;
 }
 
-// Insertar registro en BD
-$sqlInsert = "INSERT INTO folders (name, cue, folder_path, location, created_on) VALUES (:name, :cue, :folder_path, :location, CURDATE())";
+// Insertar registro en la base de datos
+$sqlInsert = "INSERT INTO folders (name, cue, folder_path, location, created_on, folder_system_name)
+              VALUES (:name, :cue, :folder_path, :location, CURDATE(), :folder_system_name)";
 $stmtInsert = $pdo->prepare($sqlInsert);
 $stmtInsert->execute([
-    ':name' => $name,
+    ':name' => $name,                          // Nombre original
     ':cue' => $cue,
-    ':folder_path' => $fullPath,
-    ':location' => $location
+    ':folder_path' => $relativePath,           // Ruta relativa para mostrar/gestionar
+    ':location' => $location,
+    ':folder_system_name' => $folderSystemName // Nombre físico real
 ]);
 
 $_SESSION['success'] = "Carpeta creada exitosamente para la escuela con CUE $cue.";

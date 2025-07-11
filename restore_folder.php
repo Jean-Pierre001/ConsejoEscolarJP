@@ -18,27 +18,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             }
 
-            // 2. Insertar carpeta en folders
-            $insert = $pdo->prepare("INSERT INTO folders (name, cue, folder_path, location, created_on) VALUES (?, ?, ?, ?, CURDATE())");
+            // 2. Construir nueva ruta física y ruta para BD (carpeta restaurada)
+            $folder_system_name = $folder['folder_system_name'];
+            $new_folder_path = "folders/" . $folder_system_name;
+
+            // 3. Insertar carpeta en folders actualizando folder_path y folder_system_name
+            $insert = $pdo->prepare("INSERT INTO folders (name, cue, folder_path, location, created_on, folder_system_name) VALUES (?, ?, ?, ?, CURDATE(), ?)");
             $insert->execute([
                 $folder['name'],
                 $folder['cue'],
-                $folder['folder_path'],
-                $folder['location']
+                $new_folder_path,
+                $folder['location'],
+                $folder_system_name
             ]);
             $new_folder_id = $pdo->lastInsertId();
 
-            // 3. Borrar carpeta de trash
+            // 4. Borrar carpeta de trash
             $delete = $pdo->prepare("DELETE FROM trash WHERE id = ?");
             $delete->execute([$folder_id]);
 
-            // 4. Mover carpeta física de trash/ a folders/
-            $old_path = 'trash/' . $folder['name'];
-            $new_path = 'folders/' . $folder['name'];
+            // 5. Mover carpeta física de trash/ a folders/
+            $old_path = __DIR__ . '/../trash/' . $folder_system_name;
+            $new_path = __DIR__ . '/../folders/' . $folder_system_name;
 
             if (is_dir($old_path)) {
-                if (!is_dir('folders')) {
-                    mkdir('folders', 0755, true);
+                if (!is_dir(__DIR__ . '/../folders')) {
+                    mkdir(__DIR__ . '/../folders', 0755, true);
                 }
 
                 // Función para mover carpeta completa recursivamente
@@ -60,6 +65,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
                 moveFolder($old_path, $new_path);
+            } else {
+                $_SESSION['error'] = "La carpeta física no existe en la papelera.";
+                header('Location: trash.php');
+                exit;
             }
 
             $_SESSION['success'] = "Carpeta restaurada correctamente.";
@@ -80,4 +89,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Location: trash.php');
     exit;
 }
-?>
