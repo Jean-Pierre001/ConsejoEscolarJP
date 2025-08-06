@@ -1,66 +1,54 @@
-<?php include 'includes/session.php'; ?>
 <?php
-  if(isset($_SESSION['user'])){
-    // Redireccionar según tipo de usuario
-    switch ($_SESSION['user']['type']) {
-      case 1:
-        header('location: index.php');
-        break;
-      default:
-        header('location: index.php');
+session_start();
+require 'includes/conn.php';
+
+$error = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = trim($_POST['username'] ?? '');
+    $password = $_POST['password'] ?? '';
+
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ?");
+    $stmt->execute([$username]);
+    $user = $stmt->fetch();
+
+    if ($user && password_verify($password, $user['password'])) {
+        // Guardar datos en sesión
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['username'] = $user['username'];
+        $_SESSION['role'] = $user['role'];
+        header("Location: index.php");
+        exit();
+    } else {
+        $error = "Usuario o contraseña incorrectos.";
     }
-  }
+}
 ?>
-<?php include 'includes/header.php'; ?>
-<body class="hold-transition login-page">
-  <link rel="stylesheet" href="assets/custom/login.css">
-  <div class="background-image"></div>
 
-  <div class="login-box custom-login-box">
-    <?php
-      if(isset($_SESSION['error'])){
-        echo "
-          <div class='alert alert-danger text-center'>
-            ".$_SESSION['error']."
-          </div>
-        ";
-        unset($_SESSION['error']);
-      }
-      if(isset($_SESSION['success'])){
-        echo "
-          <div class='alert alert-success text-center'>
-            ".$_SESSION['success']."
-          </div>
-        ";
-        unset($_SESSION['success']);
-      }
-    ?>
-    <div class="login-box-body">
-      <h3 class="login-box-msg" style="font-weight:700; margin-bottom: 20px;">Sign in to access the system</h3>
-
-      <form action="verify.php" method="POST">
-        <div class="form-group has-feedback">
-          <input type="email" class="form-control input-lg" name="email" placeholder="Email" required>
-          <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
-        </div>
-        <div class="form-group has-feedback">
-          <input type="password" class="form-control input-lg" name="password" placeholder="Password" required>
-          <span class="glyphicon glyphicon-lock form-control-feedback"></span>
-        </div>
-        <div class="row">
-          <div class="col-xs-12">
-            <button type="submit" class="btn btn-primary btn-block btn-flat btn-lg" name="login">
-              <i class="fa fa-sign-in"></i> Sign In
-            </button>
-          </div>
-        </div>
-      </form>
-      <br>
-      <a href="index.php" class="text-center"><i class="fa fa-home"></i> Home</a>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login - File Manager</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body class="bg-light">
+<div class="container d-flex justify-content-center align-items-center vh-100">
+  <form method="post" class="bg-white p-4 rounded shadow" style="width: 320px;">
+    <h4 class="text-center mb-3">Iniciar Sesión</h4>
+    <?php if ($error): ?>
+      <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+    <?php endif; ?>
+    <div class="mb-3">
+      <label>Usuario</label>
+      <input type="text" name="username" class="form-control" required autofocus />
     </div>
-  </div>
-
-<?php include 'includes/scripts.php' ?>
-
+    <div class="mb-3">
+      <label>Contraseña</label>
+      <input type="password" name="password" class="form-control" required />
+    </div>
+    <button class="btn btn-primary w-100">Ingresar</button>
+  </form>
+</div>
 </body>
 </html>
